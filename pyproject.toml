@@ -1,0 +1,7 @@
+[project]
+name = "pytheme"
+version = "0.1.0"
+description = "A Python theme manager"
+readme = "README.md"
+requires-python = ">=3.14.0b1"
+dependencies = []
