@@ -7,6 +7,21 @@ is inherently unstable as a result. It simply exists to provide an
 easier mechanism for applying themes, until a more official solution is
 decided upon.
 
+## Installation
+
+Unfortunately pytheme isn't on PyPI yet, and won't be until I'm able to
+submit a [PEP 541](https://peps.python.org/pep-0541/) request, though
+for now, you can clone and install it manually:
+
+```sh
+git clone https://github.com/parafoxia/pytheme
+pip install uv
+uv build
+pip install dist/pytheme-0.1.0-py3-none-any.whl
+```
+
+The version number won't change until it's on PyPI.
+
 ## Usage
 
 It's important to note that pytheme will only operate on the interpreter
