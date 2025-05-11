@@ -37,6 +37,21 @@ import click
 from .themes import _template
 
 
+def _get_sitecustomize_path() -> Path:
+    if sys.prefix != sys.base_prefix:
+        # This is a virtual environment.
+        import site
+
+        return Path(site.getsitepackages(prefixes=[sys.prefix])[0]) / "sitecustomize.py"
+
+    import os
+
+    return Path(os.__file__).parent / "sitecustomize.py"
+
+
+SITECUSTOMIZE_PATH = _get_sitecustomize_path()
+
+
 @click.group()
 @click.version_option()
 def pytheme():
@@ -62,29 +77,31 @@ def install(theme: str):
         click.echo(f"Theme {theme!r} does not exist.")
         return
 
-    if sys.prefix == sys.base_prefix:
-        # Not a virtual environment.
-        import os
-
-        install_path = Path(os.__file__).parent / "sitecustomize.py"
-    else:
-        # Virtual environment.
-        import site
-
-        install_path = (
-            Path(site.getsitepackages(prefixes=[sys.prefix])[0]) / "sitecustomize.py"
-        )
-
-    if install_path.exists():
+    if SITECUSTOMIZE_PATH.exists():
         ans = input(
             f"A sitecustomize.py file already exists for this interpreter. Overwrite? [y/N] ",
         )
         if not ans.lower().startswith("y"):
-            click.echo("Theme not applied.")
+            click.echo("No changed applied.")
             return
 
-    theme_path.copy(install_path)
-    click.echo(f"Theme {theme!r} installed to '{install_path}'.")
+    theme_path.copy(SITECUSTOMIZE_PATH)
+    click.echo(f"Theme {theme!r} installed to '{SITECUSTOMIZE_PATH}'.")
+
+
+@pytheme.command()
+def uninstall():
+    if not SITECUSTOMIZE_PATH.exists():
+        click.echo("No sitecustomize.py file exists for this interpreter.")
+        return
+
+    ans = input("This will remove the entire sitecustomize.py file. Continue? [y/N] ")
+    if not ans.lower().startswith("y"):
+        click.echo("No changes applied.")
+        return
+
+    SITECUSTOMIZE_PATH.unlink()
+    click.echo("Theme uninstalled.")
 
 
 if __name__ == "__main__":
