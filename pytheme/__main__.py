@@ -29,9 +29,24 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-def main():
-    print("Hello from pytheme!")
+from pathlib import Path
+
+import click
+
+from .themes import _template
+
+
+@click.group()
+@click.version_option()
+def pytheme():
+    pass
+
+
+@pytheme.command()
+def create():
+    theme = Path(_template.__file__)
+    theme.copy_into(Path()).rename("new_theme.py")
 
 
 if __name__ == "__main__":
-    main()
+    pytheme()
