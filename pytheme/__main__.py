@@ -109,5 +109,14 @@ def uninstall() -> None:
     click.echo("Theme uninstalled.")
 
 
+@pytheme.command(help="List all available themes.")
+def list() -> None:
+    for theme in filter(
+        lambda x: not x.name.startswith("_"),
+        (Path(__file__).parent / "themes").iterdir(),
+    ):
+        click.echo(f"* {theme.name.rstrip(".py")}")
+
+
 if __name__ == "__main__":
     pytheme()
