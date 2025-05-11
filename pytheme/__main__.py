@@ -29,6 +29,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+import sys
 from pathlib import Path
 
 import click
@@ -46,6 +47,44 @@ def pytheme():
 def create():
     theme = Path(_template.__file__)
     theme.copy_into(Path()).rename("new_theme.py")
+
+
+@pytheme.command()
+@click.argument("theme")
+def install(theme: str):
+    theme_path = (
+        Path(theme)
+        if theme.endswith(".py")
+        else Path(__file__).parent / "themes" / f"{theme}.py"
+    )
+
+    if not theme_path.exists():
+        click.echo(f"Theme {theme!r} does not exist.")
+        return
+
+    if sys.prefix == sys.base_prefix:
+        # Not a virtual environment.
+        import os
+
+        install_path = Path(os.__file__).parent / "sitecustomize.py"
+    else:
+        # Virtual environment.
+        import site
+
+        install_path = (
+            Path(site.getsitepackages(prefixes=[sys.prefix])[0]) / "sitecustomize.py"
+        )
+
+    if install_path.exists():
+        ans = input(
+            f"A sitecustomize.py file already exists for this interpreter. Overwrite? [y/N] ",
+        )
+        if not ans.lower().startswith("y"):
+            click.echo("Theme not applied.")
+            return
+
+    theme_path.copy(install_path)
+    click.echo(f"Theme {theme!r} installed to '{install_path}'.")
 
 
 if __name__ == "__main__":
