@@ -54,19 +54,19 @@ SITECUSTOMIZE_PATH = _get_sitecustomize_path()
 
 @click.group()
 @click.version_option()
-def pytheme():
+def pytheme() -> None:
     pass
 
 
-@pytheme.command()
-def create():
+@pytheme.command(help="Generate a new file from which you can create a new theme.")
+def create() -> None:
     theme = Path(_template.__file__)
     theme.copy_into(Path()).rename("new_theme.py")
 
 
-@pytheme.command()
+@pytheme.command(help="Install a theme into the current interpreter.")
 @click.argument("theme")
-def install(theme: str):
+def install(theme: str) -> None:
     theme_path = (
         Path(theme)
         if theme.endswith(".py")
@@ -89,8 +89,13 @@ def install(theme: str):
     click.echo(f"Theme {theme!r} installed to '{SITECUSTOMIZE_PATH}'.")
 
 
-@pytheme.command()
-def uninstall():
+@pytheme.command(
+    help=(
+        "Uninstall the currently installed theme from the interpreter. "
+        "This will remove the entire sitecustomize.py file, so be careful!."
+    ),
+)
+def uninstall() -> None:
     if not SITECUSTOMIZE_PATH.exists():
         click.echo("No sitecustomize.py file exists for this interpreter.")
         return
